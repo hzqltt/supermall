@@ -1,18 +1,19 @@
 <template>
-    <swiper>
-        <swiper-item v-for=" item in banners" :key="item.title">
+    <Swiper>
+        <SwiperItem v-for="item in banners" :key="item.title">
             <a :href="item.link">
-                <img :src="item.image">
+                <img :src="item.image" alt="" @load="swiperImgLoad">
             </a>
-        </swiper-item>
-    </swiper>
+        </SwiperItem>
+    </Swiper>
 </template>
 
+
 <script>
-import { Swiper, SwiperItem } from 'components/common/swiper'  //通过js导出对象
+import { Swiper, SwiperItem } from 'components/common/swiper';
 
 export default {
-    name: 'HomeSwiper',
+    name: "HomeSwiper",
     props: {
         banners: {
             type: Array,
@@ -21,9 +22,23 @@ export default {
             }
         }
     },
+    data() {
+        return {
+            isLoad: false
+        }
+    },
     components: {
         Swiper,
         SwiperItem
+    },
+    methods: {
+        // swiper图片加载完成事件
+        swiperImgLoad() {
+            if (!this.isLoad) {
+                this.$emit("swiperImgLoad");
+                this.isLoad = true;
+            }
+        }
     }
 }
 </script>
