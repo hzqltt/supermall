@@ -1,13 +1,16 @@
 <template>
   <div id="app">
-    ddddddddddddllll
+    <main-tab-bar></main-tab-bar>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
+import MainTabBar from './components/content/mainTabbar/MainTabBar.vue';
 export default {
   name: 'app',
   components: {
+    MainTabBar
 
   }
 }
@@ -16,4 +19,5 @@ export default {
 
 <style>
 @import "./assets/css/normalize.css";
+@import "./assets/css/base.css";
 </style>
