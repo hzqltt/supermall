@@ -6,16 +6,20 @@
         </nav-bar>
         <!-- 轮播图 -->
         <home-swiper :banners="banners"></home-swiper>
+        <!-- 推荐 -->
         <recommend :recommends="recommends"></recommend>
+        <!-- 本周推荐 -->
+        <feature></feature>
 
     </div>
 </template>
 
 <script>
-// 1.导入Navbar组件  
 import NavBar from 'components/common/navbar/NavBar';
 import HomeSwiper from './childComps/HomeSwiper.vue';
 import Recommend from './childComps/Recommend.vue';
+import Feature from './childComps/Feature.vue';
+
 import { getHomeMultidata } from 'network/home'   //default才能省略大括号
 
 
@@ -23,10 +27,10 @@ import { getHomeMultidata } from 'network/home'   //default才能省略大括号
 export default {
     name: "Home",
     components: {
-        // 2.注册NavBar组件
         NavBar,
         HomeSwiper,
-        Recommend
+        Recommend,
+        Feature
     },
     data() {
         return {
@@ -42,7 +46,6 @@ export default {
     methods: {
         // 网络请求相关 
         // 获取banner数据和推荐数据
-
         getMultiData() {
             getHomeMultidata().then(res => {
                 console.log(res);
@@ -50,8 +53,6 @@ export default {
                 this.banners = res.data.banner.list
                 this.recommends = res.data.recommend.list
             })
-
-
         }
 
     }
@@ -62,11 +63,19 @@ export default {
 #home {
     height: 100vh;
     position: relative;
+    padding-top: 44px;
 }
 
 .home-nav {
     background-color: var(--color-tint);
-    color: #fff
+    color: #fff;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 9;
+    /* z-index 属性设定了一个定位元素及其后代元素或 flex 项目的 z-order。
+    当元素之间重叠的时候，z-index 较大的元素会覆盖较小的元素在上层进行显示。 */
 }
 </style>
 
