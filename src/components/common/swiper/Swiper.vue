@@ -59,8 +59,8 @@ export default {
     },
     methods: {
         /**
-     * 定时器操作
-     */
+         * 定时器操作
+         */
         startTimer: function () {
             this.playTimer = window.setInterval(() => {
                 this.currentIndex++;

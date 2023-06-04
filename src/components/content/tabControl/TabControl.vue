@@ -27,8 +27,9 @@ export default {
     },
     methods: {
         itemClick(index) {
-            this.currentIndex = index
-
+            this.currentIndex = index;
+            // 点击tabControl  页面内容发送改变
+            this.$emit('tabClick', index)
         }
     }
 }
