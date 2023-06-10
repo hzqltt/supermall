@@ -4,27 +4,27 @@
         <nav-bar class="home-nav">
             <div slot="center">购物街</div>
         </nav-bar>
-        <!-- 轮播图 -->
-        <home-swiper :banners="banners"></home-swiper>
-        <!-- 推荐 -->
-        <recommend :recommends="recommends"></recommend>
-        <!-- 本周推荐 -->
-        <feature></feature>
-        <!--流行、新款、精选TabControl  -->
-        <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" />
-        <goods-list :goods="showGoods"></goods-list>
+        <!-- bscroll滚动 -->
+        <scroll class="content">
+            <!-- 轮播图 -->
+            <home-swiper :banners="banners"></home-swiper>
+            <!-- 推荐 -->
+            <recommend :recommends="recommends"></recommend>
+            <!-- 本周推荐 -->
+            <feature></feature>
+            <!--流行、新款、精选TabControl  -->
+            <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" />
+            <goods-list :goods="showGoods"></goods-list>
+        </scroll>
 
-
-
-
-
-        <div style="height:700px"></div>
+        <div style="height:700px;"></div>
 
     </div>
 </template>
 
 <script>
 import NavBar from 'components/common/navbar/NavBar';
+import Scroll from '@/components/common/scroll/scroll.vue';
 import TabControl from 'components/content/tabControl/TabControl';
 import GoodsList from 'components/content/goods/GoodsList'
 
@@ -40,17 +40,18 @@ import { getHomeMultidata, getHomeGoods } from 'network/home'   //default才能�
 
 
 
+
 export default {
     name: "Home",
     components: {
         NavBar,
+        Scroll,
         TabControl,
         GoodsList,
         HomeSwiper,
         Recommend,
         Feature,
-
-
+        Scroll,
     },
     data() {
         return {
@@ -290,9 +291,10 @@ export default {
 
 <style scoped>
 #home {
+    /* vh-> viewport 100视口 */
     height: 100vh;
     position: relative;
-    padding-top: 44px;
+    /* padding-top: 44px; */
 }
 
 .home-nav {
@@ -312,6 +314,16 @@ export default {
     position: sticky;
     top: 44px;
     z-index: 9;
+}
+
+.content {
+    /* height: calc(100% - 93px);
+    margin-top: 44px; */
+    /* height: 300px; */
+    /* overflow: hidden; */
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
 }
 </style>
 

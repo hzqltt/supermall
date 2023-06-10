@@ -27,10 +27,12 @@ export default {
     padding-bottom: 40px;
     position: relative;
     width: 48%;
+    height: 400px;
 }
 
 .goods-item img {
     width: 100%;
+    height: 100%;
     border-radius: 5px;
 }
 
