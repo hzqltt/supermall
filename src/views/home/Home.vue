@@ -5,7 +5,8 @@
             <div slot="center">购物街</div>
         </nav-bar>
         <!-- bscroll滚动 -->
-        <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+        <scroll class="content" ref="scroll" :probe-type="3" :pull-up-load="true" @scroll="contentScroll"
+            @pullingUp="loadMore">
             <!-- 轮播图 -->
             <home-swiper :banners="banners"></home-swiper>
             <!-- 推荐 -->
@@ -370,6 +371,8 @@ export default {
                 this.goods[type].list.push(...res.data.list)
                 this.goods[type].page += 1
 
+                this.$refs.scroll.finishPullUp()
+
             })
         },
         /**
@@ -401,8 +404,14 @@ export default {
             this.$refs.scroll.scrollTo(0, 0) //时间使用默认值300毫秒
         },
         contentScroll(position) {
-            console.log(position)
+            // console.log(position)
             this.isShow = -position.y > 1000  //大于1000 为true  否则为false
+        },
+        loadMore() {
+            console.log('上拉加载更多')
+            this.getGoods(this.currentType)
+            // 先监听图片什么时候加载完，在刷新
+            this.$refs.scroll.scroll.refush()
         }
     }
 }
