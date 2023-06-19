@@ -5,21 +5,20 @@
             <div slot="center">购物街</div>
         </nav-bar>
         <!-- bscroll滚动 -->
-        <scroll class="content" ref="scroll" :probe-type="3" :pull-up-load="true" @scroll="contentScroll"
+        <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pull-up-load="true"
             @pullingUp="loadMore">
             <!-- 轮播图 -->
             <home-swiper :banners="banners"></home-swiper>
             <!-- 推荐 -->
-            <recommend :recommends="recommends"></recommend>
+            <recommend-view :recommends="recommends" />
             <!-- 本周推荐 -->
-            <feature></feature>
+            <feature-view />
             <!--流行、新款、精选TabControl  -->
             <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" />
             <goods-list :goods="showGoods"></goods-list>
         </scroll>
         <!-- 这种封装好的组件不能直接监听原生事件  比如点击事件等  需要加上.native  原生button div组件可以直接监听原生事件-->
         <back-top @click.native="backClick" v-show="isShow"></back-top>
-
     </div>
 </template>
 
@@ -33,10 +32,11 @@ import BackTop from '@/components/content/backTop/BackTop.vue';
 
 
 import HomeSwiper from './childComps/HomeSwiper.vue';
-import Recommend from './childComps/Recommend.vue';
-import Feature from './childComps/Feature.vue';
+import RecommendView from './childComps/RecommendView.vue';
+import FeatureView from './childComps/FeatureView.vue';
 
 import { getHomeMultidata, getHomeGoods } from 'network/home'   //default才能省略大括号
+import { debounce } from '@/common/utils';
 
 
 
@@ -53,8 +53,8 @@ export default {
         GoodsList,
         BackTop,
         HomeSwiper,
-        Recommend,
-        Feature,
+        RecommendView,
+        FeatureView,
         BackTop,
         Scroll,
     },
@@ -347,7 +347,12 @@ export default {
         // this.getGoods('pop', 1)
         // this.getGoods('new', 1)
         // this.getGoods('sell', 1)
-
+    },
+    mounted() {
+        const refresh = debounce(this.$refs.scroll.refresh, 50)
+        this.$bus.$on('itemImageLoad', () => {
+            refresh()
+        })
     },
     methods: {
         /**
@@ -370,7 +375,7 @@ export default {
                 // 根据type拿到对应的数组，并往数组里添加新的数据，不覆盖原来的数据
                 this.goods[type].list.push(...res.data.list)
                 this.goods[type].page += 1
-
+                // 完成上拉加载更多
                 this.$refs.scroll.finishPullUp()
 
             })
@@ -392,26 +397,21 @@ export default {
                     break
             }
         },
-        // 
+        // 回到顶部
         backClick() {
-            // 这里能监听到
-            console.log('回到顶部');
             // this.$refs.scroll.scroll.scrollTo(0, 0, 500)  //这里是scroll组件没有定义方法的写法
             //  //500毫秒回到顶部  但是数据是本地的 不是服务器请求来的 故没有回到顶部的效果
-
-
             // 这里是scroll组件里定义了scrollTo方法的写法
             this.$refs.scroll.scrollTo(0, 0) //时间使用默认值300毫秒
         },
+
         contentScroll(position) {
-            // console.log(position)
+            console.log(position)
             this.isShow = -position.y > 1000  //大于1000 为true  否则为false
         },
+        // 加载更多
         loadMore() {
-            console.log('上拉加载更多')
             this.getGoods(this.currentType)
-            // 先监听图片什么时候加载完，在刷新
-            this.$refs.scroll.scroll.refush()
         }
     }
 }
@@ -419,10 +419,8 @@ export default {
 
 <style scoped>
 #home {
-    /* vh-> viewport 100视口 */
     height: 100vh;
     position: relative;
-    /* padding-top: 44px; */
 }
 
 .home-nav {
@@ -445,13 +443,8 @@ export default {
 }
 
 .content {
-    /* height: calc(100% - 93px);
-    margin-top: 44px; */
-    /* height: 300px; */
-    /* overflow: hidden; */
     position: absolute;
     top: 44px;
     bottom: 49px;
 }
 </style>
-
