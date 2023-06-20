@@ -332,11 +332,7 @@ export default {
             isShow: false,
             tabOffsetTop: 0,
             isTabFixed: false,
-        }
-    },
-    computed: {
-        showGoods() {
-            return this.goods[this.currentType].list
+            saveY: 0
         }
     },
     created() {
@@ -353,10 +349,26 @@ export default {
         this.$bus.$on('itemImageLoad', () => {
             refresh()
         })
-
-        // 2.获取tabControl的offsetTop （做吸顶效果）
-        // 所有的组件都有一个属性$el:用于获取组件中的元素 组件没有offsetTop属性，只有元素才有
-
+    },
+    computed: {
+        showGoods() {
+            return this.goods[this.currentType].list
+        }
+    },
+    // 页面从Home跳转到非Home页面触发
+    destroyed() {
+        console.log('home destroyed');
+    },
+    // 被 keep-alive 缓存的组件激活时调用
+    activated() {
+        console.log('home  activated');
+        this.$refs.scroll.scrollTo(0, this.saveY, 0)
+        this.$refs.scroll.refresh()
+    },
+    // 被 keep-alive 缓存的组件激活时调用。
+    deactivated() {
+        console.log('home deactivated');
+        this.saveY = this.$refs.scroll.getScrollY()
     },
     methods: {
         /**
@@ -423,6 +435,8 @@ export default {
             this.getGoods(this.currentType)
         },
         swiperImgLoad() {
+            // 2.获取tabControl的offsetTop （做吸顶效果）
+            // 所有的组件都有一个属性$el:用于获取组件中的元素 组件没有offsetTop属性，只有元素才有
             console.log(this.$refs.tabControl2.$el.offsetTop)
             this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
         }
