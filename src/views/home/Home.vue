@@ -4,17 +4,19 @@
         <nav-bar class="home-nav">
             <div slot="center">购物街</div>
         </nav-bar>
+        <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" ref="tabControl1"
+            v-show="isTabFixed" />
         <!-- bscroll滚动 -->
         <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pull-up-load="true"
             @pullingUp="loadMore">
             <!-- 轮播图 -->
-            <home-swiper :banners="banners"></home-swiper>
+            <home-swiper :banners="banners" @swiperImgLoad="swiperImgLoad" />
             <!-- 推荐 -->
             <recommend-view :recommends="recommends" />
             <!-- 本周推荐 -->
             <feature-view />
             <!--流行、新款、精选TabControl  -->
-            <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" />
+            <tab-control @tabClick="tabClick" class="tab-control" :titles="['流行', '新款', '精选']" ref="tabControl2" />
             <goods-list :goods="showGoods"></goods-list>
         </scroll>
         <!-- 这种封装好的组件不能直接监听原生事件  比如点击事件等  需要加上.native  原生button div组件可以直接监听原生事件-->
@@ -36,12 +38,7 @@ import RecommendView from './childComps/RecommendView.vue';
 import FeatureView from './childComps/FeatureView.vue';
 
 import { getHomeMultidata, getHomeGoods } from 'network/home'   //default才能省略大括号
-import { debounce } from '@/common/utils';
-
-
-
-
-
+import { debounce } from '@/common/utils'
 
 
 export default {
@@ -332,7 +329,9 @@ export default {
                 },
             },
             currentType: 'pop',
-            isShow: false
+            isShow: false,
+            tabOffsetTop: 0,
+            isTabFixed: false,
         }
     },
     computed: {
@@ -349,10 +348,15 @@ export default {
         // this.getGoods('sell', 1)
     },
     mounted() {
+        // 1.图片加载完成的事件监听
         const refresh = debounce(this.$refs.scroll.refresh, 50)
         this.$bus.$on('itemImageLoad', () => {
             refresh()
         })
+
+        // 2.获取tabControl的offsetTop （做吸顶效果）
+        // 所有的组件都有一个属性$el:用于获取组件中的元素 组件没有offsetTop属性，只有元素才有
+
     },
     methods: {
         /**
@@ -377,7 +381,6 @@ export default {
                 this.goods[type].page += 1
                 // 完成上拉加载更多
                 this.$refs.scroll.finishPullUp()
-
             })
         },
         /**
@@ -396,6 +399,9 @@ export default {
                     this.currentType = 'sell'
                     break
             }
+            // 保证两个两个tab-control点击的选项保持一致
+            this.$refs.tabControl1.currentType = index
+            this.$refs.tabControl2.currentType = index
         },
         // 回到顶部
         backClick() {
@@ -407,11 +413,18 @@ export default {
 
         contentScroll(position) {
             console.log(position)
+            // 1.判断BackTop是否显示
             this.isShow = -position.y > 1000  //大于1000 为true  否则为false
+            // 2.决定tabControl是否吸顶 （position：fixed）
+            this.isTabFixed = (-position.y) > this.tabOffsetTop
         },
         // 加载更多
         loadMore() {
             this.getGoods(this.currentType)
+        },
+        swiperImgLoad() {
+            console.log(this.$refs.tabControl2.$el.offsetTop)
+            this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
         }
     }
 }
@@ -426,10 +439,11 @@ export default {
 .home-nav {
     background-color: var(--color-tint);
     color: #fff;
-    position: fixed;
+    /* 在使用浏览器原生滚动时，为了让导航不跟随一起滚动  */
+    /* position: fixed;
     left: 0;
     right: 0;
-    top: 0;
+    top: 0; */
     z-index: 9;
     /* z-index 属性设定了一个定位元素及其后代元素或 flex 项目的 z-order。
     当元素之间重叠的时候，z-index 较大的元素会覆盖较小的元素在上层进行显示。 */
@@ -437,14 +451,10 @@ export default {
 
 .tab-control {
     /* 粘性定位元素 移动端适应  这里貌似不适应 */
-    position: sticky;
+    /* position: sticky;
     top: 44px;
+    z-index: 9; */
+    position: relative;
     z-index: 9;
-}
-
-.content {
-    position: absolute;
-    top: 44px;
-    bottom: 49px;
 }
 </style>

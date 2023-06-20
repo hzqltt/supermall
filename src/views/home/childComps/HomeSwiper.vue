@@ -34,8 +34,8 @@ export default {
         // swiper图片加载完成事件
         swiperImgLoad() {
             if (!this.isLoad) {
-                this.$emit("swiperImgLoad");
-                this.isLoad = true;
+                this.$emit("swiperImgLoad")
+                this.isLoad = true
             }
         }
     }
